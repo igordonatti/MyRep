@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <title>Primeiros passos com vue.js</title>
+</head>
+<body>
+    <div id="shopping-list">
+        <div class="header">
+            <h1>{{ header.toLocaleUpperCase() }}</h1>
+            <button 
+                v-if="state === 'default'" 
+                class="btn btn-primary" 
+                @click="changeState('edit')"
+            >
+                Add an item
+            </button>
+            <button 
+                v-else class="btn btn-cancel"
+                @click="changeState('default')"
+            >
+                Cancel
+            </button>
+                
+        </div>
+        <div v-if="state === 'edit'" class="add-item-form">
+            <input 
+                v-model="newItem" 
+                type="text" 
+                placeholder="Add an item" 
+                @keyup.enter="saveItem"
+            >
+            <button 
+                class="btn btn-primary" 
+                :disabled="newItem.length === 0"
+                @click="saveItem"
+            >
+                Save Item
+            </button>
+        </div>
+        <ul>
+            <!-- Here, our object property is the name of the class we'd like
+            to toggle, from our main.css file, and its value is the conditional
+            we respond to. -->
+            <li 
+                v-for="item in items"
+                :class="{strikeout: item.purchased}"
+                @click="togglePurchased(item)"
+            >
+                {{ item.label }}
+                <button class="btn btn-cancel" @click="deleteItem(item)"> Delete </button>
+            </li>
+        </ul>
+        <p v-if="items.length === 0">Nice Job! You've bought all yout items</p>
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        var shoppingList = new Vue({ 
+            el: '#shopping-list',
+            data: {
+                state: 'default',
+                header: 'shopping list app',
+                newItem: '',
+                items: [
+                    {
+                        label: '10 party hats',
+                        purchased: false,
+                        highPriority: false,
+                    },
+                    {
+                        label: '2 board games',
+                        purchased: true,
+                        highPriority: false,
+                    },
+                    {
+                        label: '20 cups',
+                        purchased: false,
+                        highPriority: true,
+                    },
+                ]
+            },
+            computed: {
+              reversedItems(){
+                    return this.items.slice(0).reverse();
+              }  
+            },
+            methods: {
+                //Função para adicionar ao array e resetar a caixa de entrada
+                saveItem: function(){
+                    this.items.push({
+                        label: this.newItem,
+                        purchased: false,
+                    },);
+                    this.newItem = '';
+                },
+                //Esta alterando o state do input fazendo assim ele sumir ou aparecer
+                changeState: function(newState){
+                    this.state = newState;
+
+                    this.newItem = '';
+                },
+                //Esta alterando o purchased para faze-lo ficar riscado ou não, isso ao clique do usuario
+                //Ao clique ele faz o item receber sua diferença, entao se ele tiver em true recebera false e vice versa
+                togglePurchased: function(item) {
+                    item.purchased = !item.purchased;
+                },
+                deleteItem: function(item){
+                    let indice = this.items.indexOf(item);
+                    return this.items.splice(indice, 1);
+                }
+            }
+        })
+    </script>
+    
+</body>
+</html>
